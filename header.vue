@@ -2,10 +2,10 @@
   <q-header elevated class="bg-white">
     <q-toolbar class="q-pa-sm text-grey-9">
       <!-- Main logo -->
-      <q-btn class="q-pa-md" flat round icon="fas fa-bars" size="md" @click="$emit('toggleDrawer')">
+      <q-btn class="q-pa-md" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">
       </q-btn>
       <q-toolbar-title class="text-center">
-        <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="LogoSrc" />
+        <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
       </q-toolbar-title>
       <!-- Notification Bell -->
       <q-btn flat round icon="fas fa-bell" size="md">
@@ -13,7 +13,8 @@
         <q-menu>
           <q-list class="q-pa-sm text-grey-8 text-justify" style="max-height: 300px; overflow-y: auto;">
             <q-item v-for="(notification, index) in notifications" :key="index"
-              :class="`border-all-1 border-grey-7 q-hoverable hover-notification ${notification.important}`">
+              :class="`border-all-1 border-grey-7 q-hoverable hover-notification ${notification.important}`" clickable
+              @click="notification.fn">
               <q-card class="full-width">
                 <q-card-section>
                   <div class="row items-center q-pb-xs">
@@ -33,7 +34,7 @@
       </q-btn>
 
       <!-- Btn: Header Actions -->
-      <q-btn class="q-pa-md" flat round icon="fas fa-user" size="md">
+      <q-btn class="q-pa-md" flat round :icon="BtnActionsIcon" size="md">
         <q-menu>
           <q-list class="q-pa-sm text-grey-8 text-no-wrap">
             <q-item v-for="(a, idx) in Actions" :key="idx" v-close-popup clickable @click="a.fn()">
@@ -50,16 +51,15 @@
 </template>
 
 <script>
-// Services:
-import Http from '../../services/http.js'
-import Utils from '../../services/utils.js'
-
 export default {
   name: 'ui-layoutapp2-header',
 
   props: {
+    BtnActionsIcon: String,
     Actions: Array,
-    LogoSrc: String,
+    MainLogoSrc: String,
+    LoadNotificationsFn: Function,
+    NotificationsInterval: Number,
   },
 
   data() {
@@ -68,6 +68,21 @@ export default {
       ]
     }
   },
+
+  methods: {
+    async loadNotifications() {
+      if (!!this.loadNotifications) {
+        var response = await this.LoadNotificationsFn();
+
+        this.notifications = response.data;
+      }
+    }
+  },
+
+  mounted() {
+    this.loadNotifications();
+    setInterval(this.loadNotifications, !!this.NotificationsInterval ? this.NotificationsInterval : 15000);
+  }
 
 }
 </script>

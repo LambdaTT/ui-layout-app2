@@ -19,6 +19,11 @@ export default {
   props: {
     pageTitle: String,
     breadcrumb: Array
+  },
+
+  mounted(){
+    if(!this.pageTitle) throw "The page title is undefined."
+    if(!this.breadcrumb) throw "The breadcrumb is undefined."
   }
 }
 </script>
