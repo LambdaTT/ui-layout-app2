@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated class="bg-white">
+  <q-header elevated class="menu">
     <q-toolbar class="q-pa-sm text-grey-9">
       <!-- Main logo -->
       <q-btn class="q-pa-md" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">

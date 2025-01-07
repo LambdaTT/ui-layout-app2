@@ -1,5 +1,5 @@
 <template>
-  <q-drawer class="bg-grey-3 text-grey-10 text-body2" v-model="drawerState" :breakpoint="1920"
+  <q-drawer class="menu text-body2" v-model="drawerState" :breakpoint="1920"
     @update:model-value="updateModel">
       <!-- Logo -->
       <div class="text-center q-pa-lg" v-on:click="$router.push('/')">
@@ -37,14 +37,14 @@
       </q-list>
       
       <!-- Footer -->
-      <q-footer class="socials">
+      <div class="socialsFooter">
         <div class="row justify-center">
           <div class="col-12 text-center q-pt-sm"><b>Nosso sindicato</b> nas redes sociais</div>
           <div v-for="(social, idx) in Socials" :key="idx" class="q-pa-xs">
             <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="`http://${social}`" target='_blank' />  
           </div>
         </div>
-      </q-footer>
+      </div>
   </q-drawer>
 </template>
 
@@ -83,3 +83,12 @@ export default {
 
 }
 </script>
+
+<style scoped>
+  .socialsFooter{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+</style>
