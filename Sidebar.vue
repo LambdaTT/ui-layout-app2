@@ -1,13 +1,15 @@
 <template>
-  <q-drawer class="bg-grey-3 text-grey-10 text-body2" v-model="drawerState" :breakpoint="1920" bordered
+  <q-drawer class="bg-grey-3 text-grey-10 text-body2" v-model="drawerState" :breakpoint="1920"
     @update:model-value="updateModel">
-    <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
+      <!-- Logo -->
       <div class="text-center q-pa-lg" v-on:click="$router.push('/')">
         <q-img class="main-logo vertical-middle full-width" alt="Logo do sindicato" :src="MainLogoSrc" />
       </div>
+
       <q-separator></q-separator>
+
+      <!-- Nav Items: -->
       <q-list>
-        <!-- Nav Items: -->
         <template v-for="(item, index) in NavItems" :key="index">
           <q-expansion-item v-if="item.subitems && item.subitems.length > 0" :icon="item.icon" :label="item.title">
             <q-list padding>
@@ -33,7 +35,16 @@
 
         </template>
       </q-list>
-    </q-scroll-area>
+      
+      <!-- Footer -->
+      <q-footer class="socials">
+        <div class="row justify-center">
+          <div class="col-12 text-center q-pt-sm"><b>Nosso sindicato</b> nas redes sociais</div>
+          <div v-for="(social, idx) in Socials" :key="idx" class="q-pa-xs">
+            <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="`http://${social}`" target='_blank' />  
+          </div>
+        </div>
+      </q-footer>
   </q-drawer>
 </template>
 
@@ -50,6 +61,7 @@ export default {
   props: {
     MainLogoSrc: String,
     NavItems: Array,
+    Socials: Object,
     modelValue: Boolean,
   },
 
@@ -63,6 +75,10 @@ export default {
     updateModel(val) {
       this.$emit('update:model-value', val);
     },
+    
+    openLink(url) {
+      window.open(url, '_blank');
+    }
   },
 
 }
