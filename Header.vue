@@ -8,7 +8,7 @@
         <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
       </q-toolbar-title>
       <!-- Notification Bell -->
-      <q-btn flat round icon="fas fa-bell" size="md">
+      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md">
         <q-badge color="red" floating>{{ notifications.length }}</q-badge>
         <q-menu>
           <q-list class="q-pa-sm text-grey-8 text-justify" style="max-height: 300px; overflow-y: auto;">
@@ -58,6 +58,7 @@ export default {
     BtnActionsIcon: String,
     Actions: Array,
     MainLogoSrc: String,
+    ShowNotification: Boolean,
     LoadNotificationsFn: Function,
     NotificationsInterval: Number,
   },
