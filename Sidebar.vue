@@ -9,7 +9,7 @@
       <q-separator></q-separator>
 
       <!-- Nav Items: -->
-      <q-list>
+      <q-list style="max-height: 340px; overflow-y: scroll;">
         <template v-for="(item, index) in NavItems" :key="index">
           <q-expansion-item v-if="item.subitems && item.subitems.length > 0" :icon="item.icon" :label="item.title">
             <q-list padding>
