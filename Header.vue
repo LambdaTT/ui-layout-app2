@@ -9,19 +9,19 @@
       </q-toolbar-title>
       <!-- Notification Bell -->
       <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md">
-        <q-badge color="red" floating>{{ notifications.length }}</q-badge>
+        <q-badge color="red" floating>{{ notifications.filter(obj => obj.read === 'N').length }}</q-badge>
         <q-menu>
           <q-list class="q-pa-sm text-grey-8 text-justify" style="max-height: 300px; overflow-y: auto;">
             <q-item v-for="(notification, index) in notifications" :key="index"
               :class="`border-all-1 border-grey-7 q-hoverable hover-notification ${notification.important}`" clickable
               @click="notification.fn">
-              <q-card class="full-width">
+              <q-card class="full-width" :style="setNofiticationStyle(notification.important)">
                 <q-card-section>
                   <div class="row items-center q-pb-xs">
-                    <span class="text-subtitle2 text-weight-bold">{{ notification.title }}</span>
-                    <q-icon v-if="notification.important" name="fas fa-star" color="yellow" class="q-ml-xs" />
+                    <span class="text-subtitle text-weight-bold">{{ notification.title }}</span>
+                    <q-icon v-if="notification.important" name="fas fa-star" class="q-ml-xs text-warning" />
                   </div>
-                  <div class="text-body1 q-px-xs">{{ notification.message }}</div>
+                  <div class="text-body">{{ notification.message }}</div>
                   <div class="text-caption text-grey-6 q-mt-xs">
                     <q-icon name="far fa-clock" class="q-mr-xs" /> {{ notification.date }}
                   </div>
@@ -65,8 +65,7 @@ export default {
 
   data() {
     return {
-      notifications: [
-      ]
+      notifications: []
     }
   },
 
@@ -74,8 +73,14 @@ export default {
     async loadNotifications() {
       if (!!this.loadNotifications) {
         var response = await this.LoadNotificationsFn();
-
         this.notifications = response.data;
+      }
+    },
+    setNofiticationStyle(important){
+      const color = (important)? '#F2C037':'transparent';
+      return {
+        'border-left': `5px solid ${color}`,
+        'outline': '4px solid transparent'
       }
     }
   },
