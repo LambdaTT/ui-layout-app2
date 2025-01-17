@@ -7,34 +7,10 @@
       <q-toolbar-title class="text-center">
         <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
       </q-toolbar-title>
+      
       <!-- Notification Bell -->
-      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md">
+      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('notifications')">
         <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
-        <q-menu>
-          <q-list class="q-pa-sm text-grey-8 text-justify" style="max-height: 300px; overflow-y: auto;">
-            <q-item v-for="(notification, index) in notifications" :key="index"
-              :class="`border-all-1 border-grey-7 q-hoverable hover-notification ${notification.important}`" clickable
-              @click="notification.fn">
-              <q-card class="full-width" :style="setNofiticationStyle(notification.important)">
-                <q-card-section>
-                  <div class="row items-center q-pb-xs">
-                    <q-badge v-if="notification.read == 'N'" rounded color="red" class="q-pa-xs q-mr-sm">novo</q-badge>
-                    <span class="text-subtitle text-weight-bold">{{ notification.title }}</span>
-                    <q-icon v-if="notification.important" name="fas fa-star" class="q-ml-xs text-warning" />
-                    <q-space />
-                  </div>
-                  <div class="text-body">{{ notification.message }}</div>
-                  <div class="text-caption text-grey-6 q-mt-xs">
-                    <q-icon name="far fa-clock" class="q-mr-xs" /> {{ notification.date }}
-                  </div>
-                </q-card-section>
-              </q-card>
-            </q-item>
-            <q-item>
-              <q-btn class="full-width text-grey-7" @click="this.$router.push('notifications')">Ver todas notificações</q-btn>
-            </q-item>
-          </q-list>
-        </q-menu>
       </q-btn>
 
       <!-- Btn: Header Actions -->
@@ -71,34 +47,21 @@ export default {
 
   data() {
     return {
-      notifications: [],
+      notificationCount: null,
     }
-  },
-
-  computed: {
-    notificationCount() {
-      return this.notifications.filter(obj => obj.read === 'N').length;
-    },
   },
 
   methods: {
     async loadNotifications() {
+      if(!this.ShowNotification) { return }
       if (!!this.loadNotifications) {
-        var response = await this.LoadNotificationsFn();
-        this.notifications = response.data.slice(0, maxNotifications);
+        this.notificationCount = await this.LoadNotificationsFn();
       }
     },
-    setNofiticationStyle(important){
-      const color = (important)? '#F2C037':'transparent';
-      return {
-        'border-left': `5px solid ${color}`,
-        'outline': '4px solid transparent'
-      }
-    }
   },
 
-  mounted() {
-    this.loadNotifications();
+  async mounted() {
+    setTimeout(this.loadNotifications, 500);
     setInterval(this.loadNotifications, !!this.NotificationsInterval ? this.NotificationsInterval : 15000);
   }
 
