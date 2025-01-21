@@ -5,7 +5,9 @@
       <q-btn class="q-pa-md" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">
       </q-btn>
       <q-toolbar-title class="text-center">
-        <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
+        <q-btn dense flat class="full-width" @click="() => this.$router.push('/')">
+          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
+        </q-btn>
       </q-toolbar-title>
       
       <!-- Notification Bell -->
