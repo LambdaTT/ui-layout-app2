@@ -8,7 +8,7 @@
         <span class="col q-ml-md text-left">Você gostaria de ativar as notificações?</span>
       </div>
       <div class="row justify-end">
-        <q-btn flat label="Sim" color="primary" @click="enableNotifications()"></q-btn>
+        <q-btn flat label="Sim" color="primary" @click="requestPushPermission()"></q-btn>
         <q-btn flat label="Depois" color="primary" @click="showNotificationsBanner = false"></q-btn>
         <q-btn flat label="Nunca" color="primary" @click="neverShowNotificationsBanner()"></q-btn>
       </div>
@@ -24,8 +24,7 @@ export default {
 
   data() {
     return {
-      isLogged: true,
-      showNotificationsBanner: false,
+      showNotificationsBanner: null,
     }
   },
 
@@ -38,39 +37,17 @@ export default {
     serviceWorkerSupported() {
       if ("serviceWorker" in navigator) { return true; }
       return false;
-    }
+    },
   },
 
   methods: {
     initNotificationsBanner() {
-      // Checa se existe um item no local storage "Nunca exibir Notificações"
-      let neverShow = localStorage.getItem('neverShowNotificationsBanner');
-      
-      // Caso 1: existe, retorna false
-      if(neverShow) { this.showNotificationsBanner = false; } 
-      
-      // Caso 2: não existe, verifica permissões do usuário
-      else {
-        // Caso 2a: Usuário já definiu permissão
-        if(Notification.permission === "granted" || Notification.permission === "denied") {
-          this.showNotificationsBanner = false;
-        }
-        // Caso 2b: Usuário não definiu permissão
-        else { this.showNotificationsBanner = true; }
+      if(this.notificationsSupported && this.serviceWorkerSupported) {
+        const neverShow = !!localStorage.getItem('neverShowNotificationsBanner')
+        const permissionSelected = Notification.permission === "granted" || Notification.permission === "denied";
+        return !(neverShow || permissionSelected);
       }
-    },
-
-    enableNotifications() {
-      if(this.notificationsSupported) {
-        Notification.requestPermission(result => {
-          if(result == 'granted') {
-            this.showNotificationsBanner = false;
-            this.checkForExistingPushSubscription();
-          } else if (result == 'denied') {
-            this.showNotificationsBanner = false;
-          }
-        })
-      }
+      return false;
     },
 
     neverShowNotificationsBanner() {
@@ -78,52 +55,57 @@ export default {
       this.showNotificationsBanner = false;
     },
 
-    checkForExistingPushSubscription() {
-      if(this.serviceWorkerSupported && this.notificationsSupported) {
-        let reg;
-        navigator.serviceWorker.ready.then(swreg => {
-          reg = swreg;
-          return swreg.pushManager.getSubscription()
-        }).then(sub => {
-          if(!sub) { this.createPushSubscription(reg) }
-        }).catch(error => {
-          console.error("Erro ao checar a inscrição push:", error);
-        });
+    async requestPushPermission() {
+      try {
+        this.showNotificationsBanner = false;
+        const result = await Notification.requestPermission();
+        if(result === 'granted') {
+          console.log('Notification permission granted.');
+          // Generate Token ?
+          await this.checkForExistingPushSubscription();
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission.', error);
       }
     },
 
-    createPushSubscription(reg) {
-      let vapidPublicKey = '';
-      let vapidPublicKeyConverted = this.urlBase64ToUint8Array(vapidPublicKey);
-
-      reg.pushManager.subcribe({
-        applicationServerKey: vapidPublicKeyConverted,
-        userVisibleOnly: true
-      }).then(newSub => {
-        let newSubStringified = JSON.stringify(newSub),
-            newSubJSON = JSON.parse(newSubStringified),
-            newSubQueryString = this.$utils.objToSerialString(newSubJSON)
-
-        console.log('newSub: ', newSub);
-        console.log('JSON: ', newSubJSON);
-        
-        // Save subscription object in our DB
-        // return this.$http.post(`${ENDPOINTS.PUSH}/createSubscription?${ newSubQueryString }`)
-      }).catch(err => {
-        console.log('err: ', err);
-      })
+    async checkForExistingPushSubscription() {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if(!sub) { this.createPushSubscription(reg); }
+      } catch (error) {
+        console.error("Error checking push subscription.", error);
+      }
     },
 
+    async createPushSubscription(reg) {
+      const vapidPublicKey = 'BDdP-T2uVLZkytvcZ3cy7zls0LTdwRkMcsU-wDELTTmCX_PqCIc7Y5MXG9Qqau1RFOBJFJvy5lqaSITspzIgEyI';
+      let vapidPublicKeyConverted = this.urlBase64ToUint8Array(vapidPublicKey);
+
+      // Create push subscription
+      const subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: vapidPublicKeyConverted,
+      });
+      console.log('Push subscription created.');
+      
+      // Save subscription object in our DB
+      const subscriptionJSON = JSON.parse(JSON.stringify(subscription));
+      await this.$http.post(ENDPOINTS.PUSH + '/subscription', subscriptionJSON)
+      console.log('Push subscription saved in DB', subscriptionJSON);
+    },
+  
     urlBase64ToUint8Array(base64String) {
       const padding = '='.repeat((4 - base64String.length % 4) % 4);
       const base64 = (base64String + padding)
         .replace(/\-/g, '+')
         .replace(/_/g, '/');
 
-      const rawData = window.atob(base64);
+      const rawData = atob(base64);
       const outputArray = new Uint8Array(rawData.length);
 
-      for (let i = 0; i < rawData.length; ++i) {
+      for (let i = 0; i < rawData.length; i++) {
         outputArray[i] = rawData.charCodeAt(i);
       }
       return outputArray;
@@ -131,7 +113,7 @@ export default {
   },
 
   mounted() {
-    this.initNotificationsBanner();
-  },
+    this.showNotificationsBanner = this.initNotificationsBanner();
+  }
 }
 </script>
