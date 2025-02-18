@@ -18,6 +18,10 @@
 <script>
 // Services:
 import { ENDPOINTS } from 'src/services/endpoints'
+import Auth from 'src/services/auth'
+import Firebase from 'src/services/firebase'
+
+const vapidPublicKey = 'BDdP-T2uVLZkytvcZ3cy7zls0LTdwRkMcsU-wDELTTmCX_PqCIc7Y5MXG9Qqau1RFOBJFJvy5lqaSITspzIgEyI';
 
 export default {
   name: 'ui-layoutapp2-notificationbanner',
@@ -61,7 +65,6 @@ export default {
         const result = await Notification.requestPermission();
         if(result === 'granted') {
           console.log('Notification permission granted.');
-          // Generate Token ?
           await this.checkForExistingPushSubscription();
         }
       } catch (error) {
@@ -80,7 +83,6 @@ export default {
     },
 
     async createPushSubscription(reg) {
-      const vapidPublicKey = 'BDdP-T2uVLZkytvcZ3cy7zls0LTdwRkMcsU-wDELTTmCX_PqCIc7Y5MXG9Qqau1RFOBJFJvy5lqaSITspzIgEyI';
       let vapidPublicKeyConverted = this.urlBase64ToUint8Array(vapidPublicKey);
 
       // Create push subscription
@@ -92,7 +94,8 @@ export default {
       
       // Save subscription object in our DB
       const subscriptionJSON = JSON.parse(JSON.stringify(subscription));
-      await this.$http.post(ENDPOINTS.PUSH + '/subscription', subscriptionJSON)
+      subscriptionJSON.token = await Firebase.getFCMToken(vapidPublicKey);
+      await this.$http.post(ENDPOINTS.PUSH + '/subscription', subscriptionJSON);
       console.log('Push subscription saved in DB', subscriptionJSON);
     },
   
@@ -112,8 +115,8 @@ export default {
     },
   },
 
-  mounted() {
-    this.showNotificationsBanner = this.initNotificationsBanner();
-  }
+  async mounted() {
+    this.showNotificationsBanner = this.initNotificationsBanner() && await Auth.authenticate();
+  },
 }
 </script>
