@@ -62,7 +62,8 @@ export default {
         this.showNotificationsBanner = false;
         const token = await Firebase.requestPermission();
         console.log("Token FCM:\n",token);
-        
+
+        // Cada navegador gera um token, então um usuário pode ter vários tokens!
         await this.$http.post(ENDPOINTS.PUSH + '/subscription', {token: token});
       } catch (error) {
         console.error('Error requesting notification permission.', error);
