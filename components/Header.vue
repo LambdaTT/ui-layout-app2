@@ -11,7 +11,7 @@
       </q-toolbar-title>
       
       <!-- Notification Bell -->
-      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('notifications')">
+      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('/notifications')">
         <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
       </q-btn>
 
