@@ -22,7 +22,7 @@ import Auth from 'src/services/auth'
 import Firebase from 'src/services/firebase'
 
 export default {
-  name: 'ui-layoutapp2-notificationbanner',
+  name: 'ui-layoutapp2-pushnotifications',
 
   data() {
     return {
@@ -31,27 +31,21 @@ export default {
   },
 
   computed: {
-    notificationsSupported() {
-      if ("Notification" in window) { return true; }
-      return false;
-    },
+    showBanner() {
+      // Check if the browser supports notifications and service workers
+      if (!("Notification" in window) || !("serviceWorker" in navigator)) return false;
 
-    serviceWorkerSupported() {
-      if ("serviceWorker" in navigator) { return true; }
-      return false;
+      // and if the user has not previously dismissed the banner
+      if (!!localStorage.getItem('neverShowNotificationsBanner')) return false
+
+      // and if the user has not already granted or denied permission
+      if (Notification.permission === "granted" || Notification.permission === "denied") return false
+
+      return true
     },
   },
 
   methods: {
-    initNotificationsBanner() {
-      if(this.notificationsSupported && this.serviceWorkerSupported) {
-        const neverShow = !!localStorage.getItem('neverShowNotificationsBanner')
-        const permissionSelected = Notification.permission === "granted" || Notification.permission === "denied";
-        return !(neverShow || permissionSelected);
-      }
-      return false;
-    },
-
     neverShowNotificationsBanner() {
       localStorage.setItem('neverShowNotificationsBanner', true);
       this.showNotificationsBanner = false;
@@ -60,19 +54,30 @@ export default {
     async enableNotifications() {
       try {
         this.showNotificationsBanner = false;
-        const token = await Firebase.requestPermission();
-        console.log("Token FCM:\n",token);
+        const token = await Firebase.getToken();
 
         // Cada navegador gera um token, então um usuário pode ter vários tokens!
-        await this.$http.post(ENDPOINTS.NOTIFICATION_PUSH + '/subscription', {token: token});
+        await this.$http.post('/api/messaging/v1/push/subscription', { token: token });
+
+        localStorage.setItem('FCMPushToken', token);
       } catch (error) {
         console.error('Error requesting notification permission.', error);
       }
     },
+
+    async tokenRecycle(){
+      const currentToken = localStorage.getItem('FCMPushToken');
+      const validToken = await Firebase.getToken();
+      if (!!currentToken && currentToken !== validToken) {
+        await this.$http.put(`/api/messaging/v1/push/subscription/${currentToken}`, { newToken: validToken });
+        localStorage.setItem('FCMPushToken', validToken);
+      }
+    }
   },
 
   async mounted() {
-    this.showNotificationsBanner = this.initNotificationsBanner() && await Auth.authenticate();
+    this.showNotificationsBanner = this.showBanner && await Auth.authenticate();
+    this.tokenRecycle();
   },
 }
 </script>
