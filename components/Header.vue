@@ -6,7 +6,7 @@
       </q-btn>
       <q-toolbar-title class="text-center">
         <q-btn dense flat class="full-width" @click="() => this.$router.push('/')">
-          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" />
+          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" fit="contain" />
         </q-btn>
       </q-toolbar-title>
       
@@ -72,7 +72,7 @@ export default {
 
 <style scoped>
 .main-logo {
-  max-width: 155px;
+  max-height: 70px;
 }
 
 .hover-notification:hover {
