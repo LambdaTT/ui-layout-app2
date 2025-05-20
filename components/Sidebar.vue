@@ -47,7 +47,7 @@
               <b>Nosso sindicato</b> nas redes sociais
             </div>
             <div v-for="(social, idx) in Socials" :key="idx" class="q-pa-xs">
-              <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="`https://${social}`" target='_blank' />
+              <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="social" target='_blank' />
             </div>
           </div>
         </div>
