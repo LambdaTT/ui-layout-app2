@@ -72,8 +72,8 @@ export default {
 
 <style scoped>
 .main-logo {
-  height: 72px;
-  max-width: 128px;
+  height: 81px;
+  max-width: 144px;
 }
 
 .hover-notification:hover {
