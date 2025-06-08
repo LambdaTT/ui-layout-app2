@@ -63,7 +63,7 @@ export default {
 
   computed: {
     dynamicColClass() {
-      return `col-md-${12 / (this.Actions.length + 1)}`
+      return `col-md-${12 / (this.Actions?.length ?? 0 + 1)}`
     }
   },
 
