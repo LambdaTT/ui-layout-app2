@@ -70,7 +70,7 @@ export default {
     NavItems: Array,
     Socials: {
       type: Object,
-      default: {}
+      default: () => {}
     },
     modelValue: Boolean,
   },
