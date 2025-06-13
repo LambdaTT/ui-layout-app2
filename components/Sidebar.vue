@@ -41,7 +41,7 @@
         </div>
         
         <!-- Footer -->
-        <div class="col-auto socialsFooter">
+        <div v-if="Object.keys(Socials).length > 0" class="col-auto socialsFooter">
           <div class="row justify-center">
             <div class="col-12 text-center q-pt-sm">
               <b>Nosso sindicato</b> nas redes sociais
@@ -68,7 +68,10 @@ export default {
   props: {
     MainLogoSrc: String,
     NavItems: Array,
-    Socials: Object,
+    Socials: {
+      type: Object,
+      default: {}
+    },
     modelValue: Boolean,
   },
 
