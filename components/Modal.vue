@@ -16,7 +16,7 @@
       </q-card-section>
 
       <q-card-section>
-        <div class="row justify-end">
+        <div class="row" style="gap:8px">
           <div :class="`col-12 q-py-xs-xs q-px-md-xs ${dynamicColClass}`">
             <q-btn class="full-width" dense label="Fechar" color="grey-8" icon="close" v-close-popup></q-btn>
           </div>
