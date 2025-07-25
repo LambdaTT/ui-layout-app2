@@ -3,8 +3,8 @@
     @update:model-value="updateModel">
       <div class="column no-wrap" style="height: 100%;">
         <!-- Logo -->
-        <div class="col-auto text-center q-pa-lg" v-on:click="$router.push('/')">
-          <q-img class="main-logo vertical-middle full-width" alt="Logo do sindicato" :src="MainLogoSrc" />
+        <div class="col-auto text-center" v-on:click="$router.push('/')">
+          <q-img class="main-logo vertical-middle full-width" alt="Logo do sindicato" :src="MainLogoSrc" fit="contain" :ratio="16/9" />
         </div>
         <div class="col-auto">
           <q-separator></q-separator>
@@ -93,3 +93,8 @@ export default {
 
 }
 </script>
+<style scoped>
+  .main-logo{
+    max-width: 100%;
+  }
+</style>

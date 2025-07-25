@@ -2,32 +2,37 @@
   <q-header elevated class="menu">
     <q-toolbar class="text-grey-9">
       <!-- Main logo -->
-      <q-btn class="q-pa-md" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">
-      </q-btn>
+      <div class="menu-icon text-left">
+        <q-btn class="q-pa-md menu" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">
+        </q-btn>
+      </div>
+
       <q-toolbar-title class="text-center">
         <q-btn dense flat class="full-width" @click="() => this.$router.push('/')">
-          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" fit="contain" />
+          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" :ratio="16/9" fit="contain" />
         </q-btn>
       </q-toolbar-title>
       
-      <!-- Notification Bell -->
-      <q-btn v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('/notifications')">
-        <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
-      </q-btn>
+      <div class="menu-icon text-right">
+        <!-- Notification Bell -->
+        <q-btn class="menu" v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('/notifications')">
+          <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
+        </q-btn>
 
-      <!-- Btn: Header Actions -->
-      <q-btn class="q-pa-md" flat round :icon="BtnActionsIcon" size="md">
-        <q-menu>
-          <q-list class="q-pa-sm text-grey-8 text-no-wrap">
-            <q-item v-for="(a, idx) in Actions" :key="idx" v-close-popup clickable @click="a.fn()">
-              <q-item-section side>
-                <q-icon v-if="a.icon" size="sm" :name="a.icon" />
-              </q-item-section>
-              <q-item-section v-if="a.title">{{ a.title }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
+        <!-- Btn: Header Actions -->
+        <q-btn class="q-pa-md menu" flat round :icon="BtnActionsIcon" size="md">
+          <q-menu>
+            <q-list class="q-pa-sm text-grey-8 text-no-wrap">
+              <q-item v-for="(a, idx) in Actions" :key="idx" v-close-popup clickable @click="a.fn()">
+                <q-item-section side>
+                  <q-icon v-if="a.icon" size="sm" :name="a.icon" />
+                </q-item-section>
+                <q-item-section v-if="a.title">{{ a.title }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </div>
     </q-toolbar>
   </q-header>
 </template>
@@ -72,8 +77,11 @@ export default {
 
 <style scoped>
 .main-logo {
-  height: 81px;
-  max-width: 144px;
+  max-width: 150px;
+}
+
+.menu-icon {
+  width: 100px;
 }
 
 .hover-notification:hover {
