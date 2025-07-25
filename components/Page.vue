@@ -6,9 +6,9 @@
           <PageHeader :pageTitle="PageTitle" :breadcrumb="Breadcrumb" />
         </q-card-section>
 
-        <q-card-section class="text-justify">
+        <div class="text-justify q-px-md q-pb-md">
           <slot></slot>
-        </q-card-section>
+        </div>
 
         <!--Secondary Sections-->
         <div v-for="(section, name) in $slots" :key="name">
