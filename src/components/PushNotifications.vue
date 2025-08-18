@@ -16,11 +16,6 @@
   </q-dialog>
 </template>
 <script>
-// Services:
-import { ENDPOINTS } from 'src/services/endpoints'
-import Auth from 'src/services/auth'
-import Firebase from 'src/services/firebase'
-
 export default {
   name: 'ui-layoutapp2-pushnotifications',
 
@@ -54,7 +49,7 @@ export default {
     async enableNotifications() {
       try {
         this.showNotificationsBanner = false;
-        const token = await Firebase.getToken();
+        const token = await this.$getService('firebase').getToken();
 
         // Cada navegador gera um token, então um usuário pode ter vários tokens!
         await this.$http.post('/api/messaging/v1/push/subscription', { token: token });
@@ -65,9 +60,9 @@ export default {
       }
     },
 
-    async tokenRecycle(){
+    async tokenRecycle() {
       const currentToken = localStorage.getItem('FCMPushToken');
-      const validToken = await Firebase.getToken();
+      const validToken = await this.$getService('firebase').getToken();
       if (!!currentToken && currentToken !== validToken) {
         await this.$http.put(`/api/messaging/v1/push/subscription/${currentToken}`, { newToken: validToken });
         localStorage.setItem('FCMPushToken', validToken);
@@ -76,7 +71,7 @@ export default {
   },
 
   async mounted() {
-    this.showNotificationsBanner = this.showBanner && await Auth.authenticate();
+    this.showNotificationsBanner = this.showBanner && await this.$getService('iam/auth').authenticate();
     this.tokenRecycle();
   },
 }
