@@ -47,6 +47,18 @@ export default {
   },
 
   methods: {
+    async isInMaintenance() {
+      try {
+        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/general/isInMaintenance`);
+        if (response && response.data) {
+          return response.data.tx_fieldvalue === "Y";
+        };
+      } catch (error) {
+        this.$getService('toolcase/utils').notifyError(error);
+        console.error("An error occurred while attempting to retrieve the object's data.", error);
+      }
+    },
+
     getLogo() {
       return this.$http.get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
         .then((response) => {
@@ -77,7 +89,12 @@ export default {
   },
 
   async mounted() {
-    this.getLogo();
+    let isInMaintenance = await this.isInMaintenance();
+    if (!isInMaintenance) {
+      this.$router.push('/'); // Redirect to home if not in maintenance
+      return;
+    }
+    await this.getLogo();
     await this.getSocials();
   },
 }

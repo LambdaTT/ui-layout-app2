@@ -30,7 +30,6 @@ export default {
   data() {
     return {
       $q: useQuasar(),
-      isLogged: false,
       toLoad: [],
       drawerState: false,
       socials: {},
@@ -41,17 +40,10 @@ export default {
 
   computed: {
     headerActions() {
-      if (this.isLogged) {
-        return [
-          { title: 'Meu Perfil', icon: 'fas fa-user', fn: () => this.$router.push('/myaccount') },
-          { title: 'Meu Portal', icon: 'fas fa-th-large', fn: () => this.$router.push('/loggedarea') },
-          { title: 'Sair', icon: 'fas fa-sign-out', fn: this.logout }
-        ];
-      } else {
-        return [
-          { title: 'Entrar', icon: 'fas fa-sign-in', fn: () => this.$router.push('/login') },
-        ];
-      }
+      return [
+        { title: 'Meu Perfil', icon: 'fas fa-user', fn: () => this.$router.push('/myaccount') },
+        { title: 'Sair', icon: 'fas fa-sign-out', fn: this.logout }
+      ];
     },
 
     navItems() {
@@ -59,6 +51,10 @@ export default {
         { title: 'Página Inicial', icon: 'fas fa-home', fn: () => this.$router.push('/') },
       ]
       return items;
+    },
+
+    isLogged() {
+      return !!this.$getService('iam/auth').getLoggedUser();
     }
   },
 
@@ -88,7 +84,7 @@ export default {
         if (response && response.data) { return response.data; }
       } catch (error) {
         if (error.response?.status != 401)
-          this.$utils.notifyError(error);
+          this.$getService('toolcase/utils').notifyError(error);
 
         console.error("An error occurred while attempting to retrieve notifications.", error);
       } finally {
@@ -100,7 +96,7 @@ export default {
     async logout() {
       if (!confirm("Deseja encerrar seu acesso?")) return false;
       await this.$getService('iam/auth').logout()
-      this.$router.push('/');
+      this.$router.push('/login');
     },
 
     async getSocials() {
@@ -109,14 +105,10 @@ export default {
       try {
         const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
         if (response && response.data) {
-          this.socials = response.data.reduce((acc, item) => {
-            if (item.tx_fieldvalue == null) return acc;
-            acc[item.ds_fieldname.split('_')[0]] = item.tx_fieldvalue;
-            return acc;
-          }, {});
+          this.socials = response.data;
         }
       } catch (error) {
-        this.$utils.notifyError(error);
+        this.$getService('toolcase/utils').notifyError(error);
         console.error("An error occurred while attempting to retrieve the object's data.", error);
       } finally {
         // Finalizing the loading event
@@ -146,7 +138,7 @@ export default {
     inactivityHandler() {
       var debounceTimeout = null;
 
-      this.$eventbroadcaster.$on('http-request-sent', (reqPromise) => {
+      this.$getService('toolcase/eventbroadcaster').$on('http-request-sent', (reqPromise) => {
         reqPromise.catch((err) => {
           if (!!debounceTimeout) {
             clearTimeout(debounceTimeout);
@@ -156,7 +148,7 @@ export default {
             if (err.response?.status == 401 && !(err.config?.url.includes('/iam/auth/v1/log'))) {
               this.$router.go(0);
 
-              this.$utils.notify({
+              this.$getService('toolcase/utils').notify({
                 message: 'Sua sessão expirou. Por favor, entre novamente.',
                 type: 'warning',
                 position: 'top-right',
@@ -168,19 +160,25 @@ export default {
     },
 
     loadHandler() {
-      this.$eventbroadcaster.$on('load', this.load);
-      this.$eventbroadcaster.$on('loaded', this.loaded);
+      this.$getService('toolcase/eventbroadcaster').$on('load', this.load);
+      this.$getService('toolcase/eventbroadcaster').$on('loaded', this.loaded);
     }
   },
 
   async mounted() {
-    if (await this.isInMaintenance()) this.$router.push('/maintenance');
+    this.$q.loading.show();
+    if (await this.isInMaintenance()) {
+      this.$router.push('/maintenance');
+      return;
+    }
+
+    await this.$getService('iam/auth').authenticate();
+
     await this.getLogo();
     await this.getSocials();
-
-    this.isLogged = await this.$getService('iam/auth').authenticate();
     this.inactivityHandler();
     this.loadHandler();
+    this.$q.loading.hide();
   },
 }
 </script>
