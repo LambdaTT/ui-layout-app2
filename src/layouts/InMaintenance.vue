@@ -11,7 +11,7 @@
     <q-card flat bordered class="text-center q-pa-md q-ma-md">
       <div class="box">
         <div class="icon-container row justify-center">
-          <q-img class="icon" src="resources/img/maintenance-announce.png"></q-img>
+          <q-icon name="fas fa-wrench" size="xl"></q-icon>
         </div>
         <h1 class="title">Em breve novidades!</h1>
         <div class="text-grey-9">
@@ -60,7 +60,7 @@ export default {
     },
 
     getLogo() {
-      return this.$http.get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
+      return this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
         .then((response) => {
           this.logo = response.data.tx_fieldvalue || 'resources/img/logo-horizontal.png';
         })
@@ -70,16 +70,16 @@ export default {
       // Emitting the loading event
       this.$emit('load', 'socials-read');
       try {
-        const response = await this.$http.get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
+        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
         if (response && response.data) {
-          this.socials = response.data.reduce((acc, item) => {
-            if (item.tx_fieldvalue == null) return acc;
-            acc[item.ds_fieldname.split('_')[0]] = item.tx_fieldvalue;
-            return acc;
-          }, {});
+          this.socials = Object.keys(response.data)
+            .reduce((obj, key) => {
+              if (response.data[key]) obj[key.split('_')[0]] = response.data[key];
+              return obj;
+            }, {});
         }
       } catch (error) {
-        this.$utils.notifyError(error);
+        this.$getService('toolcase/utils').notifyError(error);
         console.error("An error occurred while attempting to retrieve the object's data.", error);
       } finally {
         // Finalizing the loading event
@@ -99,7 +99,7 @@ export default {
   },
 }
 </script>
-<style>
+<style scoped>
 .main-logo {
   height: 81px;
   max-width: 144px;

@@ -9,13 +9,15 @@
 
       <q-toolbar-title class="text-center">
         <q-btn dense flat class="full-width" @click="() => this.$router.push('/')">
-          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" :ratio="16/9" fit="contain" />
+          <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="MainLogoSrc" :ratio="16 / 9"
+            fit="contain" />
         </q-btn>
       </q-toolbar-title>
-      
+
       <div class="menu-icon text-right">
         <!-- Notification Bell -->
-        <q-btn class="menu" v-if="ShowNotification" flat round icon="fas fa-bell" size="md" @click="this.$router.push('/notifications')">
+        <q-btn class="menu" v-if="ShowNotification" flat round icon="fas fa-bell" size="md"
+          @click="this.$router.push('/notifications')">
           <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
         </q-btn>
 
@@ -60,7 +62,7 @@ export default {
 
   methods: {
     async loadNotifications() {
-      if(!this.ShowNotification) { return }
+      if (!this.ShowNotification) { return }
       if (!!this.loadNotifications) {
         this.notificationCount = await this.LoadNotificationsFn();
       }

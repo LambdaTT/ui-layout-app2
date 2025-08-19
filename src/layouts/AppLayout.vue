@@ -105,7 +105,11 @@ export default {
       try {
         const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
         if (response && response.data) {
-          this.socials = response.data;
+          this.socials = Object.keys(response.data)
+            .reduce((obj, key) => {
+              if (response.data[key]) obj[key.split('_')[0]] = response.data[key];
+              return obj;
+            }, {});
         }
       } catch (error) {
         this.$getService('toolcase/utils').notifyError(error);
