@@ -3,11 +3,9 @@
     <q-banner v-if="showInstallBanner" class="q-mb-md" dense>
       <div class="text-justify">
         <q-icon name="fas fa-info-circle" size="xs" class="q-ma-xs" />
-        {{ installMessage }}
-        Clique abaixo para mais detalhes.
+        Instale este aplicativo em seu dispositivo para uma melhor experiência.
       </div>
-      <q-btn flat color="primary" @click="openVideoModal" label="Como Instalar" />
-      <q-btn flat color="primary" @click="dismissBanner" label="Dispensar" />
+      <q-btn class="q-ma-sm" color="primary" icon="fas fa-download" @click="openVideoModal" label="Instalar" />
     </q-banner>
 
     <q-dialog v-if="detectPlatform() == 'android'" v-model="videoModalOpen">
@@ -87,14 +85,15 @@ export default {
   data() {
     return {
       showInstallBanner: false,
-      installMessage: '',
       videoModalOpen: false
     };
   },
+
   methods: {
     isPwaInstalled() {
       return window.matchMedia('(display-mode: standalone)').matches;
     },
+
     detectPlatform() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       if (/android/i.test(userAgent)) {
@@ -105,29 +104,21 @@ export default {
         return 'other';
       }
     },
-    setInstallMessage() {
-      const platform = this.detectPlatform();
-      if (platform === 'android') {
-        this.installMessage = 'Para instalar este aplicativo, toque no botão de menu do seu navegador e depois em "Adicionar à tela inicial".';
-      } else if (platform === 'ios') {
-        this.installMessage = 'Para instalar este aplicativo, toque no ícone de compartilhamento do seu navegador e depois em "Adicionar à Tela de Início".';
-      } else {
-        this.installMessage = 'Para instalar este aplicativo, use a opção "Adicionar à tela inicial" do seu navegador.';
-      }
-    },
+
     dismissBanner() {
       this.showInstallBanner = false;
     },
+
     openVideoModal() {
       this.videoModalOpen = true;
     },
+
     closeVideoModal() {
       this.videoModalOpen = false;
     }
   },
-  created() {
+  mounted() {
     if (!this.isPwaInstalled()) {
-      this.setInstallMessage();
       this.showInstallBanner = true;
     }
   }
