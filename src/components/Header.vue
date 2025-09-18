@@ -15,13 +15,8 @@
       </q-toolbar-title>
 
       <div class="menu-icon text-right">
-        <!-- Notification Bell -->
-        <q-btn class="menu" v-if="ShowNotification" flat round icon="fas fa-bell" size="md"
-          @click="this.$router.push('/notifications')">
-          <q-badge v-if="notificationCount > 0" color="red" floating>{{ notificationCount }}</q-badge>
-        </q-btn>
-
-        <!-- Btn: Header Actions -->
+        <!-- Btn: Header Options -->
+        <slot name="header-options"></slot>
         <q-btn class="q-pa-md menu" flat round :icon="BtnActionsIcon" size="md">
           <q-menu>
             <q-list class="q-pa-sm text-grey-8 text-no-wrap">
@@ -40,8 +35,6 @@
 </template>
 <script>
 
-const maxNotifications = 3;
-
 export default {
   name: 'ui-layoutapp2-header',
 
@@ -49,30 +42,7 @@ export default {
     BtnActionsIcon: String,
     Actions: Array,
     MainLogoSrc: String,
-    ShowNotification: Boolean,
-    LoadNotificationsFn: Function,
-    NotificationsInterval: Number,
   },
-
-  data() {
-    return {
-      notificationCount: null,
-    }
-  },
-
-  methods: {
-    async loadNotifications() {
-      if (!this.ShowNotification) { return }
-      if (!!this.loadNotifications) {
-        this.notificationCount = await this.LoadNotificationsFn();
-      }
-    },
-  },
-
-  async mounted() {
-    setTimeout(this.loadNotifications, 500);
-    setInterval(this.loadNotifications, !!this.NotificationsInterval ? this.NotificationsInterval : 15000);
-  }
 
 }
 </script>

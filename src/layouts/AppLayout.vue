@@ -2,18 +2,31 @@
   <div class="text-grey-9">
     <q-layout view="hHh Lpr lFf" container-fluid style="height: 300px" class="shadow-2 rounded-borders">
       <Header @toggleDrawer="drawerState = !drawerState;" :Actions="headerActions" :MainLogoSrc="logo"
-        BtnActionsIcon="fas fa-user" :LoadNotificationsFn="loadNotifications" :ShowNotification="isLogged"></Header>
+        BtnActionsIcon="fas fa-user">
+        <template #header-options>
+          <NotificationBell v-if="isLogged"></NotificationBell>
+        </template>
+      </Header>
 
       <Sidebar :NavItems="navItems" :Socials="socials" :MainLogoSrc="logo" @load="load" @loaded="loaded"
         v-model="drawerState" />
 
       <q-page-container>
         <div id="content-wrapper">
+          <PushNotification>
+            <div class="row">
+              <div class="col-auto q-mb-md">
+                <q-icon name="far fa-bell" color="grey-9" size="sm"></q-icon>
+              </div>
+              <span>
+                Para manter-se atualizado com as últimas notícias habilite as notificações.
+              </span>
+            </div>
+          </PushNotification>
           <InstallationBanner class="q-px-sm"></InstallationBanner>
           <div id="page-wrapper">
             <router-view @load="load" @loaded="loaded" />
           </div>
-          <PushNotifications></PushNotifications>
         </div>
       </q-page-container>
     </q-layout>
@@ -35,6 +48,10 @@ export default {
       socials: {},
       logo: null,
       notificationsDialog: true,
+
+      // Modules:
+      $msg: this.$getModule('messaging'),
+      $iam: this.$getModule('iam'),
     }
   },
 
@@ -75,24 +92,6 @@ export default {
       }
     },
 
-    async loadNotifications() {
-      try {
-        // Emitting the loading event
-        this.$emit('load', 'notifications-load');
-        // API request
-        const response = await this.$getService('toolcase/http').get(ENDPOINTS.NOTIFICATIONS.COUNT);
-        if (response && response.data) { return response.data; }
-      } catch (error) {
-        if (error.response?.status != 401)
-          this.$getService('toolcase/utils').notifyError(error);
-
-        console.error("An error occurred while attempting to retrieve notifications.", error);
-      } finally {
-        // Finalizing the loading event
-        this.$emit('loaded', 'notifications-load');
-      }
-    },
-
     async logout() {
       if (!confirm("Deseja encerrar seu acesso?")) return false;
       await this.$getService('iam/auth').logout()
@@ -112,8 +111,11 @@ export default {
             }, {});
         }
       } catch (error) {
-        this.$getService('toolcase/utils').notifyError(error);
-        console.error("An error occurred while attempting to retrieve the object's data.", error);
+        if (error.status !== 404) {
+          this.socials = {};
+          this.$getService('toolcase/utils').notifyError(error);
+          console.error("An error occurred while attempting to retrieve the object's data.", error);
+        }
       } finally {
         // Finalizing the loading event
         this.$emit('loaded', 'channel-read');
@@ -175,8 +177,6 @@ export default {
       this.$router.push('/maintenance');
       return;
     }
-
-    await this.$getService('iam/auth').authenticate();
 
     await this.getLogo();
     await this.getSocials();
