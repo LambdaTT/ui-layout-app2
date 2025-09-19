@@ -79,8 +79,11 @@ export default {
             }, {});
         }
       } catch (error) {
-        this.$getService('toolcase/utils').notifyError(error);
-        console.error("An error occurred while attempting to retrieve the object's data.", error);
+        if (error.status !== 404) {
+          this.socials = {};
+          this.$getService('toolcase/utils').notifyError(error);
+          console.error("An error occurred while attempting to retrieve the object's data.", error);
+        }
       } finally {
         // Finalizing the loading event
         this.$emit('loaded', 'channel-read');
