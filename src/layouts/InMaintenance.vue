@@ -67,8 +67,6 @@ export default {
     },
 
     async getSocials() {
-      // Emitting the loading event
-      this.$emit('load', 'socials-read');
       try {
         const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
         if (response && response.data) {
@@ -84,9 +82,6 @@ export default {
           this.$getService('toolcase/utils').notifyError(error);
           console.error("An error occurred while attempting to retrieve the object's data.", error);
         }
-      } finally {
-        // Finalizing the loading event
-        this.$emit('loaded', 'channel-read');
       }
     },
   },
