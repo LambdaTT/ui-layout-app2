@@ -1,7 +1,7 @@
 <template>
   <div class="text-grey-9">
     <q-layout view="hHh Lpr lFf" container-fluid style="height: 300px" class="shadow-2 rounded-borders">
-      <Header @toggleDrawer="drawerState = !drawerState;" :Actions="headerActions" :MainLogoSrc="logo"
+      <Header @toggleDrawer="drawerState = !drawerState;" :Actions="headerOptions" :MainLogoSrc="logo"
         BtnActionsIcon="fas fa-user">
         <template #header-options>
           <NotificationBell v-if="isLogged"></NotificationBell>
@@ -40,6 +40,11 @@ import ENDPOINTS from '../ENDPOINTS'
 import { useQuasar } from 'quasar'
 
 export default {
+  props: {
+    HeaderOptions: Array,
+    NavItems: Array,
+  },
+
   data() {
     return {
       $q: useQuasar(),
@@ -56,18 +61,12 @@ export default {
   },
 
   computed: {
-    headerActions() {
-      return [
-        { title: 'Meu Perfil', icon: 'fas fa-user', fn: () => this.$router.push('/myaccount') },
-        { title: 'Sair', icon: 'fas fa-sign-out', fn: this.logout }
-      ];
+    headerOptions() {
+      return this.HeaderOptions
     },
 
     navItems() {
-      let items = [
-        { title: 'Página Inicial', icon: 'fas fa-home', fn: () => this.$router.push('/') },
-      ]
-      return items;
+      return this.NavItems
     },
 
     isLogged() {
