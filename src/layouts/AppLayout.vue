@@ -1,15 +1,30 @@
 <template>
   <div class="text-grey-9">
-    <q-layout view="hHh Lpr lFf" container-fluid style="height: 300px" class="shadow-2 rounded-borders">
-      <Header @toggleDrawer="drawerState = !drawerState;" :Actions="headerOptions" :MainLogoSrc="logo"
-        BtnActionsIcon="fas fa-user">
+    <q-layout
+      view="hHh Lpr lFf"
+      container-fluid
+      style="height: 300px"
+      class="shadow-2 rounded-borders"
+    >
+      <Header
+        @toggleDrawer="drawerState = !drawerState"
+        :Actions="headerActions"
+        :MainLogoSrc="logo"
+        BtnActionsIcon="fas fa-user"
+      >
         <template #header-options>
           <NotificationBell v-if="isLogged"></NotificationBell>
         </template>
       </Header>
 
-      <Sidebar :NavItems="navItems" :Socials="socials" :MainLogoSrc="logo" @load="load" @loaded="loaded"
-        v-model="drawerState" />
+      <Sidebar
+        :NavItems="NavItems"
+        :Socials="socials"
+        :MainLogoSrc="logo"
+        @load="load"
+        @loaded="loaded"
+        v-model="drawerState"
+      />
 
       <q-page-container>
         <div id="content-wrapper">
@@ -19,7 +34,8 @@
                 <q-icon name="far fa-bell" color="grey-9" size="sm"></q-icon>
               </div>
               <span>
-                Para manter-se atualizado com as últimas notícias habilite as notificações.
+                Para manter-se atualizado com as últimas notícias habilite as
+                notificações.
               </span>
             </div>
           </PushNotification>
@@ -34,15 +50,18 @@
 </template>
 
 <script>
-import ENDPOINTS from '../ENDPOINTS'
+import ENDPOINTS from "../ENDPOINTS";
 
 // Libs:
-import { useQuasar } from 'quasar'
+import { useQuasar } from "quasar";
 
 export default {
   props: {
     HeaderOptions: Array,
-    NavItems: Array,
+    NavItems: {
+      type: Array,
+      default: () => [],
+    },
   },
 
   data() {
@@ -55,30 +74,21 @@ export default {
       notificationsDialog: true,
 
       // Modules:
-      $msg: this.$getModule('messaging'),
-      $iam: this.$getModule('iam'),
-    }
+      $msg: this.$getModule("messaging"),
+      $iam: this.$getModule("iam"),
+    };
   },
 
   computed: {
-    headerOptions() {
-      return this.HeaderOptions
-    },
-
-    navItems() {
-      return this.NavItems
-    },
-
     isLogged() {
-      return !!this.$getService('iam/auth').getLoggedUser();
-    }
+      return !!this.$getService("iam/auth").getLoggedUser();
+    },
   },
 
   methods: {
     load(evt) {
       this.$q.loading.show();
-      if (evt && evt != '')
-        this.toLoad.push(evt);
+      if (evt && evt != "") this.toLoad.push(evt);
     },
 
     loaded(evt) {
@@ -93,87 +103,104 @@ export default {
 
     async logout() {
       if (!confirm("Deseja encerrar seu acesso?")) return false;
-      await this.$getService('iam/auth').logout()
-      this.$router.push('/login');
+      await this.$getService("iam/auth").logout();
+      this.$router.push("/login");
     },
 
     async getSocials() {
       // Emitting the loading event
-      this.$emit('load', 'socials-read');
+      this.$emit("load", "socials-read");
       try {
-        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
+        const response = await this.$getService("toolcase/http").get(
+          `${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`,
+        );
         if (response && response.data) {
-          this.socials = Object.keys(response.data)
-            .reduce((obj, key) => {
-              if (response.data[key]) obj[key.split('_')[0]] = response.data[key];
-              return obj;
-            }, {});
+          this.socials = Object.keys(response.data).reduce((obj, key) => {
+            if (response.data[key]) obj[key.split("_")[0]] = response.data[key];
+            return obj;
+          }, {});
         }
       } catch (error) {
         if (error.status !== 404) {
           this.socials = {};
-          this.$getService('toolcase/utils').notifyError(error);
-          console.error("An error occurred while attempting to retrieve the object's data.", error);
+          this.$getService("toolcase/utils").notifyError(error);
+          console.error(
+            "An error occurred while attempting to retrieve the object's data.",
+            error,
+          );
         }
       } finally {
         // Finalizing the loading event
-        this.$emit('loaded', 'channel-read');
+        this.$emit("loaded", "channel-read");
       }
     },
 
     getLogo() {
-      return this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
+      return this.$getService("toolcase/http")
+        .get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
         .then((response) => {
-          this.logo = response.data.tx_fieldvalue || '/resources/img/logo-sindicato.png'
-        })
+          this.logo =
+            response.data.tx_fieldvalue || "/resources/img/logo-sindicato.png";
+        });
     },
 
     async isInMaintenance() {
       try {
-        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/general/isInMaintenance`);
+        const response = await this.$getService("toolcase/http").get(
+          `${ENDPOINTS.SETTINGS.SINGLE}/general/isInMaintenance`,
+        );
         if (response && response.data) {
           return response.data.tx_fieldvalue === "Y";
-        };
+        }
       } catch (error) {
-        this.$getService('toolcase/utils').notifyError(error);
-        console.error("An error occurred while attempting to retrieve the object's data.", error);
+        this.$getService("toolcase/utils").notifyError(error);
+        console.error(
+          "An error occurred while attempting to retrieve the object's data.",
+          error,
+        );
       }
     },
 
     inactivityHandler() {
       var debounceTimeout = null;
 
-      this.$getService('toolcase/eventbroadcaster').$on('http-request-sent', (reqPromise) => {
-        reqPromise.catch((err) => {
-          if (!!debounceTimeout) {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = null;
-          }
-          debounceTimeout = setTimeout(() => {
-            if (err.response?.status == 401 && !(err.config?.url.includes('/iam/auth/v1/log'))) {
-              this.$router.go(0);
-
-              this.$getService('toolcase/utils').notify({
-                message: 'Sua sessão expirou. Por favor, entre novamente.',
-                type: 'warning',
-                position: 'top-right',
-              });
+      this.$getService("toolcase/eventbroadcaster").$on(
+        "http-request-sent",
+        (reqPromise) => {
+          reqPromise.catch((err) => {
+            if (!!debounceTimeout) {
+              clearTimeout(debounceTimeout);
+              debounceTimeout = null;
             }
-          }, 200);
-        });
-      });
+            debounceTimeout = setTimeout(() => {
+              if (
+                err.response?.status == 401 &&
+                !err.config?.url.includes("/iam/auth/v1/log")
+              ) {
+                this.$router.go(0);
+
+                this.$getService("toolcase/utils").notify({
+                  message: "Sua sessão expirou. Por favor, entre novamente.",
+                  type: "warning",
+                  position: "top-right",
+                });
+              }
+            }, 200);
+          });
+        },
+      );
     },
 
     loadHandler() {
-      this.$getService('toolcase/eventbroadcaster').$on('load', this.load);
-      this.$getService('toolcase/eventbroadcaster').$on('loaded', this.loaded);
-    }
+      this.$getService("toolcase/eventbroadcaster").$on("load", this.load);
+      this.$getService("toolcase/eventbroadcaster").$on("loaded", this.loaded);
+    },
   },
 
   async mounted() {
     this.$q.loading.show();
     if (await this.isInMaintenance()) {
-      this.$router.push('/maintenance');
+      this.$router.push("/maintenance");
       return;
     }
 
@@ -183,7 +210,7 @@ export default {
     this.loadHandler();
     this.$q.loading.hide();
   },
-}
+};
 </script>
 <style scoped>
 #content-wrapper {
