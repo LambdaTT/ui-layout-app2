@@ -1,11 +1,38 @@
 <template>
   <div>
-    <q-banner v-if="showInstallBanner" class="q-mb-md" dense>
-      <div class="text-justify">
-        <q-icon name="fas fa-info-circle" size="xs" class="q-ma-xs" />
+    <q-banner
+      v-if="showInstallBanner"
+      class="install-banner q-mb-md rounded-borders q-mx-sm q-mt-sm shadow-1"
+      dense
+    >
+      <template v-slot:avatar>
+        <q-icon name="fas fa-mobile-alt" color="primary" class="q-mt-xs" />
+      </template>
+
+      <div class="text-caption text-grey-9" style="line-height: 1.2">
         Instale este aplicativo em seu dispositivo para uma melhor experiência.
       </div>
-      <q-btn class="q-ma-sm" color="primary" icon="fas fa-download" @click="openVideoModal" label="Instalar" />
+
+      <template v-slot:action>
+        <q-btn
+          flat
+          dense
+          color="grey-6"
+          icon="close"
+          class="q-mr-xs"
+          @click="dismissBanner"
+          aria-label="Minimizar"
+        />
+        <q-btn
+          unelevated
+          size="sm"
+          color="primary"
+          icon="fas fa-download"
+          label="Instalar"
+          @click="openVideoModal"
+          class="text-weight-bold rounded-borders q-px-sm"
+        />
+      </template>
     </q-banner>
 
     <q-dialog v-if="detectPlatform() == 'android'" v-model="videoModalOpen">
@@ -16,7 +43,8 @@
         </q-toolbar>
         <q-card-section>
           <div class="text-subtitle1">
-            <b>Passo 1:</b> Abra o menu do navegador clicando no ícone localizado no canto superior direito da tela
+            <b>Passo 1:</b> Abra o menu do navegador clicando no ícone
+            localizado no canto superior direito da tela
           </div>
           <div>
             <q-img src="~assets/installation/android1.png"></q-img>
@@ -27,10 +55,14 @@
 
         <q-card-section>
           <div class="text-subtitle1">
-            <b>Passo 2:</b> No menu suspenso que vai se abrir, localize a opção "Adicionar à Tela Inicial".
+            <b>Passo 2:</b> No menu suspenso que vai se abrir, localize a opção
+            "Adicionar à Tela Inicial".
           </div>
           <div>
             <q-img src="~assets/installation/android2.png"></q-img>
+          </div>
+          <div class="q-mt-md">
+            <b>Pronto!</b>
           </div>
         </q-card-section>
 
@@ -50,7 +82,8 @@
         </q-toolbar>
         <q-card-section>
           <div class="text-subtitle1">
-            <b>Passo 1:</b> Abra o menu de compartilhamento clicando no ícone localizado na parte de baixo da tela.
+            <b>Passo 1:</b> Abra o menu de compartilhamento clicando no ícone
+            localizado na parte de baixo da tela.
           </div>
           <div>
             <q-img src="~assets/installation/iphone1.png"></q-img>
@@ -61,10 +94,14 @@
 
         <q-card-section>
           <div class="text-subtitle1">
-            <b>Passo 2:</b> No menu que vai se abrir, localize a opção "Adicionar à Tela de Início".
+            <b>Passo 2:</b> No menu que vai se abrir, localize a opção
+            "Adicionar à Tela de Início".
           </div>
           <div>
             <q-img src="~assets/installation/iphone2.png"></q-img>
+          </div>
+          <div>
+            <b>Pronto!</b>
           </div>
         </q-card-section>
 
@@ -80,28 +117,28 @@
 
 <script>
 export default {
-  name: 'ui-layoutapp2-installationbanner',
+  name: "ui-layoutapp2-installationbanner",
 
   data() {
     return {
       showInstallBanner: false,
-      videoModalOpen: false
+      videoModalOpen: false,
     };
   },
 
   methods: {
     isPwaInstalled() {
-      return window.matchMedia('(display-mode: standalone)').matches;
+      return window.matchMedia("(display-mode: standalone)").matches;
     },
 
     detectPlatform() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       if (/android/i.test(userAgent)) {
-        return 'android';
+        return "android";
       } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return 'ios';
+        return "ios";
       } else {
-        return 'other';
+        return "other";
       }
     },
 
@@ -115,19 +152,19 @@ export default {
 
     closeVideoModal() {
       this.videoModalOpen = false;
-    }
+    },
   },
   mounted() {
     if (!this.isPwaInstalled()) {
       this.showInstallBanner = true;
     }
-  }
+  },
 };
 </script>
 
 <style scoped>
-.q-banner {
-  background-color: #343a40;
-  color: #f8f9fa;
+.install-banner {
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--q-primary);
 }
 </style>

@@ -8,7 +8,7 @@
     >
       <Header
         @toggleDrawer="drawerState = !drawerState"
-        :Actions="headerActions"
+        :Actions="HeaderOptions"
         :MainLogoSrc="logo"
         BtnActionsIcon="fas fa-user"
       >
