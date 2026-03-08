@@ -42,6 +42,7 @@
           <InstallationBanner class="q-px-sm"></InstallationBanner>
           <div id="page-wrapper">
             <router-view @load="load" @loaded="loaded" />
+            AQUI: {{ currentRoute }}
           </div>
         </div>
       </q-page-container>
@@ -61,6 +62,10 @@ export default {
     NavItems: {
       type: Array,
       default: () => [],
+    },
+    DefaultRoute: {
+      type: String,
+      default: () => "/",
     },
   },
 
@@ -82,6 +87,16 @@ export default {
   computed: {
     isLogged() {
       return !!this.$getService("iam/auth").getLoggedUser();
+    },
+
+    currentRoute() {
+      return this.$route.fullPath;
+    },
+  },
+
+  watch: {
+    currentRoute(v) {
+      if (v === "/" || v === "") this.$router.push(this.DefaultRoute);
     },
   },
 
@@ -201,6 +216,11 @@ export default {
     this.$q.loading.show();
     if (await this.isInMaintenance()) {
       this.$router.push("/maintenance");
+      return;
+    }
+
+    if (this.$route.fullPath === "/" || this.$route.fullPath === "") {
+      this.$router.push(this.DefaultRoute);
       return;
     }
 
