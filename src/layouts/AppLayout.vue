@@ -152,7 +152,7 @@ export default {
 
     getLogo() {
       return this.$getService("toolcase/http")
-        .get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
+        .get(`${ENDPOINTS.SETTINGS.SINGLE}/institutional/logo`)
         .then((response) => {
           this.logo =
             response.data.tx_fieldvalue || "/resources/img/logo-sindicato.png";
