@@ -42,7 +42,6 @@
           <InstallationBanner class="q-px-sm"></InstallationBanner>
           <div id="page-wrapper">
             <router-view @load="load" @loaded="loaded" />
-            AQUI: {{ currentRoute }}
           </div>
         </div>
       </q-page-container>
@@ -52,9 +51,6 @@
 
 <script>
 import ENDPOINTS from "../ENDPOINTS";
-
-// Libs:
-import { useQuasar } from "quasar";
 
 export default {
   props: {
@@ -71,8 +67,6 @@ export default {
 
   data() {
     return {
-      $q: useQuasar(),
-      toLoad: [],
       drawerState: false,
       socials: {},
       logo: null,
@@ -101,21 +95,6 @@ export default {
   },
 
   methods: {
-    load(evt) {
-      this.$q.loading.show();
-      if (evt && evt != "") this.toLoad.push(evt);
-    },
-
-    loaded(evt) {
-      var index = this.toLoad.indexOf(evt);
-
-      if (index != -1) this.toLoad.splice(index, 1);
-
-      if (this.toLoad.length == 0) {
-        this.$q.loading.hide();
-      }
-    },
-
     async logout() {
       if (!confirm("Deseja encerrar seu acesso?")) return false;
       await this.$getService("iam/auth").logout();
@@ -205,15 +184,9 @@ export default {
         },
       );
     },
-
-    loadHandler() {
-      this.$getService("toolcase/eventbroadcaster").$on("load", this.load);
-      this.$getService("toolcase/eventbroadcaster").$on("loaded", this.loaded);
-    },
   },
 
   async mounted() {
-    this.$q.loading.show();
     if (await this.isInMaintenance()) {
       this.$router.push("/maintenance");
       return;
@@ -228,7 +201,6 @@ export default {
     await this.getSocials();
     this.inactivityHandler();
     this.loadHandler();
-    this.$q.loading.hide();
   },
 };
 </script>
