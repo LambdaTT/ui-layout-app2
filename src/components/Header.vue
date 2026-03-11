@@ -1,6 +1,6 @@
 <template>
-  <q-header elevated class="menu">
-    <q-toolbar class="text-grey-9">
+  <q-header elevated class="menu" :style="HeaderStyle">
+    <q-toolbar :class="HeaderStyle && HeaderStyle.color ? '' : 'text-grey-9'" :style="HeaderStyle">
       <!-- Main logo -->
       <div class="menu-icon text-left">
         <q-btn class="q-pa-md menu" flat round icon="fas fa-bars" size="md" @click="$emit('toggle-drawer')">
@@ -42,6 +42,10 @@ export default {
     BtnActionsIcon: String,
     Actions: Array,
     MainLogoSrc: String,
+    HeaderStyle: {
+      type: [Object, String],
+      default: () => ({}),
+    },
   },
 
 }

@@ -1,5 +1,5 @@
 <template>
-  <q-drawer class="menu text-body2" v-model="drawerState" :breakpoint="1920" @update:model-value="updateModel">
+  <q-drawer class="menu text-body2" v-model="drawerState" :breakpoint="1920" @update:model-value="updateModel" :style="SidebarStyle">
     <div class="column no-wrap" style="height: 100%;">
       <!-- Logo -->
       <div class="col-auto text-center q-pa-md" v-on:click="$router.push('/')">
@@ -71,6 +71,10 @@ export default {
     Socials: {
       type: Object,
       default: () => { }
+    },
+    SidebarStyle: {
+      type: [Object, String],
+      default: () => ({}),
     },
     modelValue: Boolean,
   },

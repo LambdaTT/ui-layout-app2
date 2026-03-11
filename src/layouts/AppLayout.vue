@@ -1,15 +1,13 @@
 <template>
-  <div class="text-grey-9">
+  <div class="text-grey-9" style="background: transparent">
     <q-layout
       view="hHh Lpr lFf"
-      container-fluid
-      style="height: 300px"
-      class="shadow-2 rounded-borders"
     >
       <Header
         @toggleDrawer="drawerState = !drawerState"
         :Actions="HeaderOptions"
         :MainLogoSrc="logo"
+        :HeaderStyle="HeaderStyle"
         BtnActionsIcon="fas fa-user"
       >
         <template #header-options>
@@ -21,13 +19,14 @@
         :NavItems="NavItems"
         :Socials="socials"
         :MainLogoSrc="logo"
+        :SidebarStyle="SidebarStyle"
         @load="load"
         @loaded="loaded"
         v-model="drawerState"
       />
 
       <q-page-container>
-        <div id="content-wrapper">
+        <div id="content-wrapper" :style="ContentStyle">
           <PushNotification>
             <div class="row">
               <div class="col-auto q-mb-md">
@@ -63,6 +62,9 @@ export default {
       type: String,
       default: () => "/",
     },
+    HeaderStyle: [Object, String],
+    SidebarStyle: [Object, String],
+    ContentStyle: [Object, String],
   },
 
   data() {
@@ -200,13 +202,11 @@ export default {
     await this.getLogo();
     await this.getSocials();
     this.inactivityHandler();
-    this.loadHandler();
   },
 };
 </script>
 <style scoped>
 #content-wrapper {
-  background-color: #e9ecef;
   text-align: center;
 }
 </style>
