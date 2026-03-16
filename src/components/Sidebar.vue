@@ -1,24 +1,42 @@
 <template>
-  <q-drawer class="menu text-body2" v-model="drawerState" :breakpoint="1920" @update:model-value="updateModel" :style="SidebarStyle">
-    <div class="column no-wrap" style="height: 100%;">
+  <q-drawer
+    class="menu text-body2"
+    v-model="drawerState"
+    :breakpoint="1920"
+    @update:model-value="updateModel"
+    :style="SidebarStyle"
+  >
+    <div class="column no-wrap" style="height: 100%">
       <!-- Logo -->
       <div class="col-auto text-center q-pa-md" v-on:click="$router.push('/')">
-        <q-img class="main-logo vertical-middle full-width" alt="Logo do sindicato" :src="MainLogoSrc" fit="contain"
-          :ratio="16 / 9" />
+        <q-img
+          class="main-logo vertical-middle full-width"
+          alt="Logo do sindicato"
+          :src="MainLogoSrc"
+          fit="contain"
+          :ratio="16 / 9"
+        />
       </div>
       <div class="col-auto">
         <q-separator></q-separator>
       </div>
       <!-- Nav Items: -->
-      <div class="col" style="overflow-y: auto;">
+      <div class="col" style="overflow-y: auto">
         <q-list>
           <div v-for="(item, index) in NavItems" :key="index">
-            <q-expansion-item v-if="item.subitems && item.subitems.length > 0" :icon="item.icon" :label="item.title">
+            <q-expansion-item
+              v-if="item.subitems && item.subitems.length > 0"
+              :icon="item.icon"
+              :label="item.title"
+            >
               <q-list padding>
-                <q-item v-for="(subitem, idx) in item.subitems" :key="idx" clickable @click="subitem.fn">
-                  <q-item-section avatar>
-                    &nbsp;
-                  </q-item-section>
+                <q-item
+                  v-for="(subitem, idx) in item.subitems"
+                  :key="idx"
+                  clickable
+                  @click="subitem.fn"
+                >
+                  <q-item-section avatar> &nbsp; </q-item-section>
                   <q-item-section>
                     <span>
                       <q-icon name="fas fa-chevron-right" size="10px"></q-icon>
@@ -41,28 +59,18 @@
       </div>
 
       <!-- Footer -->
-      <div v-if="Object.keys(Socials).length > 0" class="col-auto socialsFooter">
-        <div class="row justify-center">
-          <div class="col-12 text-center q-pt-sm">
-            <b>Nosso sindicato</b> nas redes sociais
-          </div>
-          <div v-for="(social, idx) in Socials" :key="idx" class="q-pa-xs">
-            <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="social" target='_blank' />
-          </div>
-        </div>
-      </div>
+      <slot name="footer"></slot>
     </div>
   </q-drawer>
 </template>
 
 <script>
-
 export default {
-  name: 'ui-layoutapp2-sidebar',
+  name: "ui-layoutapp2-sidebar",
   data() {
     return {
       drawerState: false,
-    }
+    };
   },
 
   props: {
@@ -70,7 +78,7 @@ export default {
     NavItems: Array,
     Socials: {
       type: Object,
-      default: () => { }
+      default: () => {},
     },
     SidebarStyle: {
       type: [Object, String],
@@ -82,20 +90,19 @@ export default {
   watch: {
     modelValue(value) {
       this.drawerState = value;
-    }
+    },
   },
 
   methods: {
     updateModel(val) {
-      this.$emit('update:model-value', val);
+      this.$emit("update:model-value", val);
     },
 
     openLink(url) {
-      window.open(url, '_blank');
-    }
+      window.open(url, "_blank");
+    },
   },
-
-}
+};
 </script>
 <style scoped>
 .main-logo {

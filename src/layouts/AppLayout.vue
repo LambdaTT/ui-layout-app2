@@ -1,8 +1,6 @@
 <template>
   <div class="text-grey-9" style="background: transparent">
-    <q-layout
-      view="hHh Lpr lFf"
-    >
+    <q-layout view="hHh Lpr lFf">
       <Header
         @toggleDrawer="drawerState = !drawerState"
         :Actions="HeaderOptions"
@@ -20,10 +18,12 @@
         :Socials="socials"
         :MainLogoSrc="logo"
         :SidebarStyle="SidebarStyle"
-        @load="load"
-        @loaded="loaded"
         v-model="drawerState"
-      />
+      >
+        <template #footer v-if="'sidebar-footer' in $slots">
+          <slot name="sidebar-footer"></slot>
+        </template>
+      </Sidebar>
 
       <q-page-container>
         <div id="content-wrapper" :style="ContentStyle">
