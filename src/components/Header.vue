@@ -17,8 +17,8 @@
       <div class="menu-icon text-right">
         <!-- Btn: Header Options -->
         <slot name="header-options"></slot>
-        <q-btn class="q-pa-md menu" flat round :icon="BtnActionsIcon" size="md">
-          <q-menu>
+        <q-btn v-if="BtnActionsIcon" class="q-pa-md menu" flat round :icon="BtnActionsIcon" size="md">
+          <q-menu v-if="Actions && Actions.length">
             <q-list class="q-pa-sm text-grey-8 text-no-wrap">
               <q-item v-for="(a, idx) in Actions" :key="idx" v-close-popup clickable @click="a.fn()">
                 <q-item-section side>

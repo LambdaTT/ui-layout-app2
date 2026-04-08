@@ -6,10 +6,11 @@
         :Actions="HeaderOptions"
         :MainLogoSrc="logo"
         :HeaderStyle="HeaderStyle"
-        BtnActionsIcon="fas fa-user"
       >
         <template #header-options>
           <NotificationBell v-if="isLogged"></NotificationBell>
+          <!-- Slot para o pai injetar ações específicas do app -->
+          <slot name="header-actions"></slot>
         </template>
       </Header>
 
