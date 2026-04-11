@@ -28,18 +28,13 @@
 
       <q-page-container>
         <div id="content-wrapper" :style="ContentStyle">
-          <PushNotification>
-            <div class="row">
-              <div class="col-auto q-mb-md">
-                <q-icon name="far fa-bell" color="grey-9" size="sm"></q-icon>
-              </div>
-              <span>
-                Para manter-se atualizado com as últimas notícias habilite as
-                notificações.
-              </span>
-            </div>
+          <PushNotification v-if="'push-notification' in $slots">
+            <slot name="push-notification"> </slot>
           </PushNotification>
-          <InstallationBanner class="q-px-sm"></InstallationBanner>
+          <InstallationBanner
+            v-if="Installable"
+            class="q-px-sm"
+          ></InstallationBanner>
           <div id="page-wrapper">
             <router-view @load="load" @loaded="loaded" />
           </div>
@@ -66,6 +61,7 @@ export default {
     HeaderStyle: [Object, String],
     SidebarStyle: [Object, String],
     ContentStyle: [Object, String],
+    Installable: Boolean,
   },
 
   data() {
