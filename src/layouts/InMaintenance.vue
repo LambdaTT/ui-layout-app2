@@ -1,7 +1,7 @@
 <template>
-  <div class="column bg-grey-3" style="height: 100%;">
+  <div class="column bg-grey-3" style="height: 100%">
     <q-card square>
-      <q-toolbar :class="`text-grey-9 ${logo ? 'menu' : 'bg-grey-10'}`" style="height: 89px;">
+      <q-toolbar :class="`text-grey-9 ${logo ? 'menu' : 'bg-grey-10'}`" style="height: 89px">
         <q-toolbar-title class="text-center">
           <q-img class="main-logo vertical-middle" alt="Logo Principal" :src="logo" fit="contain" />
         </q-toolbar-title>
@@ -15,13 +15,22 @@
         </div>
         <h1 class="title">Em breve novidades!</h1>
         <div class="text-grey-9">
-          <p class="sub-title q-px-sm">Estamos fazendo algumas melhorias para oferecer uma experiência ainda melhor.
-            Voltamos em breve!</p>
+          <p class="sub-title q-px-sm">
+            Estamos fazendo algumas melhorias para oferecer uma experiência ainda melhor. Voltamos
+            em breve!
+          </p>
           <div v-if="Object.keys(socials).length > 0">
             <p class="caption">Enquanto isso, acompanhe-nos nas redes sociais:</p>
             <div class="row flex-center">
               <div v-for="(social, idx) in socials" :key="idx" class="q-pa-sm">
-                <q-btn outline round :icon="`fab fa-${idx}`" size='12px' :href="social" target='_blank' />
+                <q-btn
+                  outline
+                  round
+                  :icon="`fab fa-${idx}`"
+                  size="12px"
+                  :href="social"
+                  target="_blank"
+                />
               </div>
             </div>
           </div>
@@ -49,51 +58,55 @@ export default {
   methods: {
     async isInMaintenance() {
       try {
-        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/general/isInMaintenance`);
+        const response = await this.$getService('toolcase/http').get(
+          `${ENDPOINTS.SETTINGS.SINGLE}/general/isInMaintenance`,
+        )
         if (response && response.data) {
-          return response.data.tx_fieldvalue === "Y";
-        };
+          return response.data.tx_fieldvalue === 'Y'
+        }
       } catch (error) {
-        this.$getService('toolcase/utils').notifyError(error);
-        console.error("An error occurred while attempting to retrieve the object's data.", error);
+        this.$getService('toolcase/utils').notifyError(error)
+        console.error("An error occurred while attempting to retrieve the object's data.", error)
       }
     },
 
     getLogo() {
-      return this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
+      return this.$getService('toolcase/http')
+        .get(`${ENDPOINTS.SETTINGS.SINGLE}/institution/logo`)
         .then((response) => {
-          this.logo = response.data.tx_fieldvalue || 'resources/img/logo-horizontal.png';
+          this.logo = response.data.tx_fieldvalue || 'resources/img/logo-horizontal.png'
         })
     },
 
     async getSocials() {
       try {
-        const response = await this.$getService('toolcase/http').get(`${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`);
+        const response = await this.$getService('toolcase/http').get(
+          `${ENDPOINTS.SETTINGS.CONTEXT_OBJ}/socials`,
+        )
         if (response && response.data) {
-          this.socials = Object.keys(response.data)
-            .reduce((obj, key) => {
-              if (response.data[key]) obj[key.split('_')[0]] = response.data[key];
-              return obj;
-            }, {});
+          this.socials = Object.keys(response.data).reduce((obj, key) => {
+            if (response.data[key]) obj[key.split('_')[0]] = response.data[key]
+            return obj
+          }, {})
         }
       } catch (error) {
         if (error.status !== 404) {
-          this.socials = {};
-          this.$getService('toolcase/utils').notifyError(error);
-          console.error("An error occurred while attempting to retrieve the object's data.", error);
+          this.socials = {}
+          this.$getService('toolcase/utils').notifyError(error)
+          console.error("An error occurred while attempting to retrieve the object's data.", error)
         }
       }
     },
   },
 
   async mounted() {
-    let isInMaintenance = await this.isInMaintenance();
+    let isInMaintenance = await this.isInMaintenance()
     if (!isInMaintenance) {
-      this.$router.push('/'); // Redirect to home if not in maintenance
-      return;
+      this.$router.push('/') // Redirect to home if not in maintenance
+      return
     }
-    await this.getLogo();
-    await this.getSocials();
+    await this.getLogo()
+    await this.getSocials()
   },
 }
 </script>
@@ -108,7 +121,6 @@ export default {
 }
 
 .icon {
-
   max-width: 180px;
 }
 
